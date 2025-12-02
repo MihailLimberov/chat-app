@@ -33,7 +33,7 @@ export const NavigationItem = ({
                     params?.serverId === id ? "h-9" : "h-2"
                 )} />
                 <div className={cn(
-                    "relative group flex mx-3 h-12 w-6 group-hover:rounded-4 transition-all overflow-hidden",
+                    "relative group flex mx-3 h-12 w-12 rounded-3xl group-hover:rounded-2xl transition-all overflow-hidden",
                     params?.serverId === id && "bg-primary/10 text-primary rounded-4"
                 )}>
                     <Image
