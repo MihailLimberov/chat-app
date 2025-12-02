@@ -21,6 +21,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@uploadthing/react": "^7.3.3",
     "axios": "^1.13.2",
+    "babel-plugin-react-compiler": "^1.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
