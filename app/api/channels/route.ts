@@ -3,7 +3,9 @@ import { db } from "@/lib/db";
 import { MemberRole } from "@/lib/generated/prisma/enums";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(
+    req: Request
+) {
     try {
         const profile = await currentProfile();
         const { name, type } = await req.json();

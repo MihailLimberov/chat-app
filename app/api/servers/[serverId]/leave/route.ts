@@ -3,48 +3,45 @@ import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ serverId: string }> }
+    req: Request,
+    { params }: { params: { serverId: string } },
 ) {
-  try {
+    try {
+        const profile = await currentProfile();
+        const { serverId } = await params;
 
-    const { serverId } = await params;
+        if (!profile) {
+            return new NextResponse("Unauthorized", { status: 401 });
+        }
+        if (!serverId) {
+            return new NextResponse("Server ID missing", { status: 400 });
+        }
 
-    const profile = await currentProfile();
-    if (!profile) {
-      return new NextResponse("Unauthorized", { status: 401 });
+        const server = await db.server.update({
+            where: {
+                id: serverId,
+                profileId: {
+                    not: profile.id,
+                },
+                members: {
+                    some: {
+                        profileId: profile.id,
+                    }
+                }
+            },
+            data: {
+                members: {
+                    deleteMany: {
+                        profileId: profile.id,
+                    }
+                }
+            }
+        });
+
+        return NextResponse.json(server);
     }
-
-    if (!serverId) {
-      return new NextResponse("Server ID Missing", { status: 400 });
+    catch (error) {
+        console.log("[SERVER_ID_LEAVE]", error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
-
-    const server = await db.server.findUnique({
-      where: { id: serverId },
-    });
-
-    if (!server) {
-      return new NextResponse("Server not found", { status: 404 });
-    }
-
-    if (server.profileId === profile.id) {
-      return new NextResponse("Owner cannot leave server", { status: 400 });
-    }
-
-    const updated = await db.server.update({
-      where: { id: serverId },
-      data: {
-        members: {
-          deleteMany: {
-            profileId: profile.id,
-          },
-        },
-      },
-    });
-
-    return NextResponse.json(updated);
-  } catch (error) {
-    console.log("[SERVER_ID_LEAVE]", error);
-    return new NextResponse("Internal Error", { status: 500 });
-  }
 }

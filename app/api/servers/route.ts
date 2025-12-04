@@ -1,10 +1,9 @@
+import { currentProfile } from "@/lib/current-profile";
+import { db } from "@/lib/db";
+import { ProfileScalarFieldEnum } from "@/lib/generated/prisma/internal/prismaNamespace";
+import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { MemberRole } from "@/lib/generated/prisma/enums";
-
-import { currentProfile } from "@/lib/current-profile";
-
-import { db } from "@/lib/db";
-import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try {
@@ -23,20 +22,22 @@ export async function POST(req: Request) {
                 inviteCode: uuidv4(),
                 channels: {
                     create: [
-                        { name: "general", profileId: profile.id },
+                        { name: "general", profileId: profile.id }
                     ]
                 },
                 members: {
                     create: [
-                        { profileId: profile.id, role: MemberRole.ADMIN },
+                        { profileId: profile.id, role: MemberRole.ADMIN }
                     ]
                 }
-            },
+
+            }
         });
 
         return NextResponse.json(server);
+
     } catch (error) {
         console.log("[SERVERS_POST]", error);
-        return new NextResponse("Internal error", { status: 500 });
+        return new NextResponse("Internal Error", { status: 500 });
     }
 }

@@ -10,7 +10,7 @@ export async function DELETE(
 
         const profile = await currentProfile();
         const { serverId } = await params;
-        
+
 
         if (!profile) {
             return new NextResponse("Unauthorized", { status: 401 });
@@ -21,7 +21,7 @@ export async function DELETE(
                 id: serverId,
                 profileId: profile.id,
             }
-          
+
 
         });
 
@@ -32,7 +32,6 @@ export async function DELETE(
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
-
 
 export async function PATCH(
     req: Request,
