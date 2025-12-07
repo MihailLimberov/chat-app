@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { cn } from "@/lib/utils";
 import { ModalProvider } from "@/components/providers/modal-provider";
+import { SocketProvider } from "@/components/providers/socket-provider";
 
 
 
@@ -34,16 +35,18 @@ export default function RootLayout({
         <body
           className={cn(
             "bg-white dark:bg-[#313338]")}
-          // {`${geistSans.variable} ${geistMono.variable} antialiased`} 
-          >
+        // {`${geistSans.variable} ${geistMono.variable} antialiased`} 
+        >
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
             storageKey="chat-app-theme">
-            <ModalProvider />
-            {children}
+            <SocketProvider>
+              <ModalProvider />
+              {children}
+            </SocketProvider>
           </ThemeProvider>
 
         </body>
