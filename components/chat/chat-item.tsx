@@ -45,22 +45,7 @@ interface ChatItemProps {
 
 export const ChatItem = ({ id, content, member, timestamp, fileUrl, deleted, currentMember, isUpdated, socketUrl, socketQuery }: ChatItemProps) => {
 
-    // let fileType = "";
-
-    // const getFileType = () => {
-    //     let xhr = new XMLHttpRequest();
-    //     xhr.open('HEAD', String(fileUrl), true);
-    //     xhr.onload = function () {
-    //         let contentType = xhr.getResponseHeader('Content-Type');
-    //         console.log("This t:" + contentType);
-    //         fileType = String(contentType);
-    //     };
-    //     xhr.send();
-    // }
-    // getFileType();
-
     const [isEditing, setIsEditing] = useState(false);
-    //const [isDeleting, setIsDeleting] = useState(false);
     const { onOpen } = useModal();
     const params = useParams();
     const router = useRouter();

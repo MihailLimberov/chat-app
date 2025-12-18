@@ -48,8 +48,7 @@ export const ChatInput = ({
                 url: apiUrl,
                 query: query,
             });
-            //values.content="abc"; // later can be encrypted
-            //console.log(values.content);
+           
             await axios.post(url, values);
 
             form.reset();

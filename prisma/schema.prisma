@@ -63,11 +63,11 @@ model Member {
   serverId String
   server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
 
-  messages Message[]
+  messages       Message[]
   directMessages DirectMessage[]
 
   conversationsInitiated Conversation[] @relation("MemberOne")
-  conversationsReceived Conversation[] @relation("MemberTwo")
+  conversationsReceived  Conversation[] @relation("MemberTwo")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -116,46 +116,45 @@ model Message {
 
   deleted Boolean @default(false)
 
- createdAt DateTime @default(now())
- updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([channelId])
   @@index([memberId])
 }
 
-model Conversation{
+model Conversation {
   id String @id @default(uuid())
 
   memberOneId String
-  memberOne Member @relation("MemberOne",fields: [memberOneId],references: [id],onDelete: Cascade)
+  memberOne   Member @relation("MemberOne", fields: [memberOneId], references: [id], onDelete: Cascade)
 
   memberTwoId String
-  memberTwo Member @relation("MemberTwo",fields: [memberTwoId],references: [id],onDelete: Cascade)
+  memberTwo   Member @relation("MemberTwo", fields: [memberTwoId], references: [id], onDelete: Cascade)
 
-@@index([memberOneId])
-@@index([memberTwoId])
+  directMessages DirectMessage[]
 
-directMessages DirectMessage[]
-
-@@unique([memberOneId,memberTwoId])
+  @@unique([memberOneId, memberTwoId])
+  @@index([memberOneId])
+  @@index([memberTwoId])
 }
 
-model DirectMessage{
-id String @id @default(uuid())
-content String @db.Text
-fileUrl String? @db.Text
+model DirectMessage {
+  id      String  @id @default(uuid())
+  content String  @db.Text
+  fileUrl String? @db.Text
 
-memberId String
-member Member @relation(fields: [memberId],references: [id],onDelete: Cascade)
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
-conversationId String
-conversation Conversation @relation(fields: [conversationId],references: [id],onDelete: Cascade)
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
-createdAt DateTime @default(now())
-updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-deleted Boolean @default(false)
+  deleted Boolean @default(false)
 
-@@index([memberId])
-@@index([conversationId])
+  @@index([memberId])
+  @@index([conversationId])
 }
