@@ -19,7 +19,7 @@ export const ServerHeader = ({
     const { onOpen } = useModal();
 
     const isAdmin = role === MemberRole.ADMIN;
-    const isModerator = isAdmin || MemberRole.MODERATOR;
+    const isModerator = role === MemberRole.MODERATOR;
 
 
     return (
@@ -31,7 +31,7 @@ export const ServerHeader = ({
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 text-xs font-medium text-black dark:text-neutral-400 space-y-0.5">
-                {isModerator && (
+                {(isAdmin || isModerator) && (
                     <DropdownMenuItem
                         onClick={() => onOpen("invite", { server: server })}
                         className="text-green-500 dark:text-green-300 px-3 py-2 text-sm cursor-pointer">
@@ -55,7 +55,7 @@ export const ServerHeader = ({
                         <Users className="h-4 w-4 ml-auto" />
                     </DropdownMenuItem>
                 )}
-                {isModerator && (
+                {(isModerator || isAdmin) && (
                     <DropdownMenuItem
                         onClick={() => onOpen("createChannel")}
                         className="px-3 py-2 text-sm cursor-pointer">
@@ -63,7 +63,7 @@ export const ServerHeader = ({
                         <PlusCircle className="h-4 w-4 ml-auto" />
                     </DropdownMenuItem>
                 )}
-                {isModerator && (
+                {(isModerator || isAdmin) && (
                     <DropdownMenuSeparator />
                 )}
                 {isAdmin && (

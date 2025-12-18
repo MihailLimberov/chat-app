@@ -1,15 +1,9 @@
 "use client";
 import axios from "axios";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-import { log } from "console";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { FileUpload } from "@/components/file-upload";
-import { useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
 import { Label } from "../ui/label";
 import { Check, Copy, RefreshCw } from "lucide-react";
@@ -39,7 +33,6 @@ export const InviteModal = () => {
 
     const onNew = async () => {
         try {
-
             setIsLoading(true);
             const response = await axios.patch(`/api/servers/${server?.id}/invite-code`);
             console.log(server?.inviteCode);
@@ -67,7 +60,7 @@ export const InviteModal = () => {
                         Server invite Link
                     </Label>
                     <div className="flex items-center mt-2 gap-x-2">
-                        <Input onChange={()=>{}}
+                        <Input onChange={() => { }}
                             disabled={isLoading}
                             className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
                             value={inviteUrl} />
