@@ -16,6 +16,11 @@ export async function GET(
         const cursor = searchParams.get("cursor");
         const channelId = searchParams.get("channelId");
 
+        const key = process.env.ENCRYPTION_KEY;
+
+        // Create an encryptor:
+        let encryptor = require('simple-encryptor')(key);
+
         if (!profile) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
@@ -70,6 +75,10 @@ export async function GET(
 
         if (messages.length === MESSAGES_BATCH) {
             nextCursor = messages[MESSAGES_BATCH -1].id;
+        }
+
+        for (let i = 0; i < messages.length; i++) {
+            messages[i].content = encryptor.decrypt(messages[i].content)
         }
 
         return NextResponse.json({

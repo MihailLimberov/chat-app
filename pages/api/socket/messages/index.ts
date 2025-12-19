@@ -16,6 +16,12 @@ export default async function handler(
         const { content, fileUrl } = req.body;
         const { serverId, channelId } = req.query;
 
+        const key = process.env.ENCRYPTION_KEY;
+
+        // Create an encryptor:
+        let encryptor = require('simple-encryptor')(key);
+        let encryptedContent = encryptor.encrypt(content);
+
         if (!profile) {
             return res.status(401).json({ error: "Unauthorized" });
         }
@@ -66,7 +72,7 @@ export default async function handler(
 
         const message = await db.message.create({
             data: {
-                content,
+                content:encryptedContent,
                 fileUrl,
                 channelId: channelId as string,
                 memberId: member.id,
@@ -81,9 +87,8 @@ export default async function handler(
         });
 
         const channelKey = `chat:${channelId}:messages`;
-
+        message.content = encryptor.decrypt(message.content);
         res?.socket?.server?.io?.emit(channelKey, message);
-
         return res.status(200).json(message);
     }
     catch (error) {
