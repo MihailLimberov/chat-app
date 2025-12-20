@@ -9,23 +9,27 @@ export async function GET(
     req: Request
 ) {
     try {
-
         const profile = await currentProfile();
         const { searchParams } = new URL(req.url);
 
         const cursor = searchParams.get("cursor");
         const channelId = searchParams.get("channelId");
 
-        const key = process.env.ENCRYPTION_KEY;
-
-        // Create an encryptor:
-        let encryptor = require('simple-encryptor')(key);
-
         if (!profile) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
         if (!channelId) {
             return new NextResponse("Channel ID missing", { status: 400 });
+        }
+
+        const key = process.env.ENCRYPTION_KEY;
+        let encryptor: any = null;
+        if (key) {
+            try {
+                encryptor = require('simple-encryptor')(key);
+            } catch (e) {
+                console.log("Encryption key error", e);
+            }
         }
 
         let messages: Message[] = [];
@@ -42,6 +46,11 @@ export async function GET(
                 },
                 include: {
                     member: {
+                        include: {
+                            profile: true,
+                        }
+                    },
+                    seenBy: {
                         include: {
                             profile: true,
                         }
@@ -63,6 +72,11 @@ export async function GET(
                         include: {
                             profile: true,
                         }
+                    },
+                    seenBy: {
+                        include: {
+                            profile: true,
+                        }
                     }
                 },
                 orderBy: {
@@ -74,11 +88,19 @@ export async function GET(
         let nextCursor = null;
 
         if (messages.length === MESSAGES_BATCH) {
-            nextCursor = messages[MESSAGES_BATCH -1].id;
+            nextCursor = messages[MESSAGES_BATCH - 1].id;
         }
 
-        for (let i = 0; i < messages.length; i++) {
-            messages[i].content = encryptor.decrypt(messages[i].content)
+        // Safe Decryption
+        if (encryptor) {
+            messages = messages.map((message) => {
+                try {
+                    const decrypted = encryptor.decrypt(message.content);
+                    return { ...message, content: decrypted || message.content };
+                } catch (e) {
+                    return message;
+                }
+            })
         }
 
         return NextResponse.json({
