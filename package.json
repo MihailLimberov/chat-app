@@ -47,6 +47,7 @@
     "react-dom": "19.2.0",
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.66.1",
+    "react-intersection-observer": "^10.0.0",
     "simple-encryptor": "^4.0.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",

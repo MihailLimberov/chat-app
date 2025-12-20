@@ -17,10 +17,14 @@ export default async function handler(
         const { serverId, channelId } = req.query;
 
         const key = process.env.ENCRYPTION_KEY;
-
-        // Create an encryptor:
-        let encryptor = require('simple-encryptor')(key);
-        let encryptedContent = encryptor.encrypt(content);
+        let encryptor: any = null;
+        if (key) {
+             try {
+                encryptor = require('simple-encryptor')(key);
+             } catch (e) {
+                console.log("Encryption key error", e);
+             }
+        }
 
         if (!profile) {
             return res.status(401).json({ error: "Unauthorized" });
@@ -70,9 +74,14 @@ export default async function handler(
             return res.status(404).json({ message: "Member not Found" });
         }
 
+        let encryptedContent = content;
+        if (encryptor) {
+            encryptedContent = encryptor.encrypt(content);
+        }
+
         const message = await db.message.create({
             data: {
-                content:encryptedContent,
+                content: encryptedContent,
                 fileUrl,
                 channelId: channelId as string,
                 memberId: member.id,
@@ -82,12 +91,21 @@ export default async function handler(
                     include: {
                         profile: true,
                     }
+                },
+                seenBy: {
+                    include: {
+                        profile: true,
+                    }
                 }
             }
         });
 
         const channelKey = `chat:${channelId}:messages`;
-        message.content = encryptor.decrypt(message.content);
+
+        if (encryptor) {
+             message.content = encryptor.decrypt(message.content) || message.content;
+        }
+
         res?.socket?.server?.io?.emit(channelKey, message);
         return res.status(200).json(message);
     }

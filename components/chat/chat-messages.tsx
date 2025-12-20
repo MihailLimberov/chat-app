@@ -1,23 +1,17 @@
 "use client";
 
-import { Member, Message, Profile } from "@/lib/generated/prisma/client";
+import type { Member } from "@/lib/generated/prisma/client";
 import { ChatWelcome } from "./chat-welcome";
 import { useChatQuery } from "@/hooks/use-chat-query";
 import { Loader2, ServerCrash } from "lucide-react";
-import { Fragment } from "react/jsx-runtime";
+import { Fragment, useRef, ElementRef } from "react";
 import { ChatItem } from "./chat-item";
 import { format } from "date-fns";
 import { useChatSocket } from "@/hooks/use-chat-socket";
-import { useRef, ElementRef } from "react";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
+import { MessageWithMemberWithProfile } from "@/types";
 
 const DATE_FORMAT = "d MMM yyyy, HH:mm";
-
-type MessageWithMemberWithProfile = Message & {
-    member: Member & {
-        profile: Profile
-    }
-}
 
 interface ChatMessagesProps {
     name: string;
@@ -42,8 +36,6 @@ export const ChatMessages = ({
     paramValue,
     type,
 }: ChatMessagesProps) => {
-
-
     const queryKey = `chat:${chatId}`;
     const addKey = `chat:${chatId}:messages`;
     const updateKey = `chat:${chatId}:messages:update`;
@@ -89,7 +81,6 @@ export const ChatMessages = ({
         );
     }
 
-    
     return (
         <div ref={chatRef} className="flex-1 flex flex-col py-4 overflow-y-auto">
             {!hasNextPage && <div className="flex-1" />}
@@ -106,10 +97,11 @@ export const ChatMessages = ({
                 </div>
             )}
             <div className="flex flex-col-reverse mt-auto">
-                {data?.pages?.map((group, index) => (
+                {data?.pages?.map((group: any, index: number) => (
                     <Fragment key={index}>
                         {group.items.map((message: MessageWithMemberWithProfile) => (
-                            <ChatItem key={message.id}
+                            <ChatItem 
+                                key={message.id}
                                 id={message.id}
                                 currentMember={member}
                                 member={message.member}
@@ -119,7 +111,9 @@ export const ChatMessages = ({
                                 timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
                                 isUpdated={message.updatedAt !== message.createdAt}
                                 socketUrl={socketUrl}
-                                socketQuery={socketQuery} />
+                                socketQuery={socketQuery}
+                                seenBy={message.seenBy} 
+                            />
                         ))}
                     </Fragment>
                 ))}
