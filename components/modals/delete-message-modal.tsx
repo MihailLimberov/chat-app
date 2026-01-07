@@ -49,7 +49,7 @@ export const DeleteMessageModal = () => {
                         Delete Message
                     </DialogTitle>
                     <DialogDescription className="text-center text-zinc-500">
-                        Are you sure to delete channel? <br />
+                        Are you sure to delete message? <br />
                         The massage will be permanently deleted
                     </DialogDescription>
                 </DialogHeader>

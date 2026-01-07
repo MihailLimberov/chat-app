@@ -18,6 +18,12 @@ export default async function handler(
         const { messageId, serverId, channelId } = req.query;
         const { content } = req.body;
 
+        const key = process.env.ENCRYPTION_KEY;
+
+        // Create an encryptor:
+        let encryptor = require('simple-encryptor')(key);
+        let encryptedContent = encryptor.encrypt(content);
+
         if (!profile) {
             return res.status(401).json({ error: "Unauthorized" });
         }
@@ -98,7 +104,7 @@ export default async function handler(
                 },
                 data: {
                     fileUrl: null,
-                    content: "Message has been deleted",
+                    content:encryptor.encrypt("Message has been deleted"),
                     deleted: true,
                 },
                 include: {
@@ -122,7 +128,7 @@ export default async function handler(
                     id: messageId as string,
                 },
                 data: {
-                    content: content,
+                    content: encryptedContent,
                 },
                 include: {
                     member: {
@@ -135,9 +141,8 @@ export default async function handler(
         }
 
         const updateKey = `chat:${channelId}:messages:update`;
-
+        message.content = encryptor.decrypt(message.content);
         res?.socket?.server?.io?.emit(updateKey, message);
-
         return res.status(200).json(message);
     }
     catch (error) {

@@ -16,6 +16,16 @@ export default async function handler(
         const { content, fileUrl } = req.body;
         const { conversationId } = req.query;
 
+        const key = process.env.ENCRYPTION_KEY;
+        let encryptor: any = null;
+        if (key) {
+             try {
+                encryptor = require('simple-encryptor')(key);
+             } catch (e) {
+                console.log("Encryption key error", e);
+             }
+        }
+
         if (!profile) {
             return res.status(401).json({ error: "Unauthorized" });
         }
@@ -25,7 +35,6 @@ export default async function handler(
         if (!content) {
             return res.status(400).json({ error: "Content Missing" });
         }
-
 
         const conversation = await db.conversation.findFirst({
             where: {
@@ -55,10 +64,10 @@ export default async function handler(
                     }
                 }
             }
-        });
+        })
 
         if (!conversation) {
-            return res.status(404).json({ message: "Conversation not found" });
+            return res.status(404).json({ message: "Conversation Not Found" });
         }
 
         const member = conversation.memberOne.profileId === profile.id ? conversation.memberOne : conversation.memberTwo;
@@ -67,9 +76,14 @@ export default async function handler(
             return res.status(404).json({ message: "Member not Found" });
         }
 
+        let encryptedContent = content;
+        if (encryptor) {
+            encryptedContent = encryptor.encrypt(content);
+        }
+
         const message = await db.directMessage.create({
             data: {
-                content,
+                content: encryptedContent,
                 fileUrl,
                 conversationId: conversationId as string,
                 memberId: member.id,
@@ -79,14 +93,23 @@ export default async function handler(
                     include: {
                         profile: true,
                     }
+                },
+                // FIX: Include seenBy here too
+                seenBy: {
+                    include: {
+                        profile: true,
+                    }
                 }
             }
         });
 
         const channelKey = `chat:${conversationId}:messages`;
 
-        res?.socket?.server?.io?.emit(channelKey, message);
+        if (encryptor) {
+            message.content = encryptor.decrypt(message.content) || message.content;
+        }
 
+        res?.socket?.server?.io?.emit(channelKey, message);
         return res.status(200).json(message);
     }
     catch (error) {

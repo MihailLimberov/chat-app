@@ -57,7 +57,7 @@ export const EditServerModal = () => {
     }
 
     const handleClose = () => {
-        //form.reset();//commented? 
+        //form.reset();//not needed
         onClose();
     }
 

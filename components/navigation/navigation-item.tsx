@@ -33,11 +33,12 @@ export const NavigationItem = ({
                     params?.serverId === id ? "h-9" : "h-2"
                 )} />
                 <div className={cn(
-                    "relative group flex mx-3 h-12 w-6 group-hover:rounded-4 transition-all overflow-hidden",
-                    params?.serverId === id && "bg-primary/10 text-primary rounded-4"
-                )}>
+                     "relative mx-3 h-12 w-12 overflow-hidden rounded-xl transition-[border-radius] duration-300",
+                     "group-hover:rounded-full",
+                     params?.serverId === id && "bg-primary/10 text-primary rounded-full"
+                )}>     
                     <Image
-                        // sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
                         src={imageUrl} fill alt="Channel" />
 
                 </div>
