@@ -21,8 +21,16 @@ export default async function handler(
         const key = process.env.ENCRYPTION_KEY;
 
         // Create an encryptor:
-        let encryptor = require('simple-encryptor')(key);
-        let encryptedContent = encryptor.encrypt(content);
+        let encryptor: any = null;
+        let encryptedContent: any = null;
+        if (key) {
+            try {
+                encryptor = require('simple-encryptor')(key);
+                encryptedContent = encryptor.encrypt(content);
+            } catch (e) {
+                console.log("Encryption key error", e);
+            }
+        }
 
         if (!profile) {
             return res.status(401).json({ error: "Unauthorized" });
